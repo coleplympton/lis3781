@@ -10,11 +10,6 @@
 2. AMPPS Installation
 3. Questions 
 4. Entity Relationship Diagram, and SQL Code 
-5. Bitbucket repo links:
-
-    a)this assignment and
-
-    b) the completed tutorial (bitbucketstationlocations)
 
 #### README.md file should include the following items:
 
@@ -25,12 +20,12 @@
 
 #### Git commands w/short descriptions:
 
-git init - Creates a new Git repository
-git status - Displays the state of the working directory and the staging area
-git add - Adds a change in the working directory to the staging area
-git commit - Captures a snapshot of the projects currently staged changes
-git push - Upload local repository content to a remote repository
-git pull - Fetch an download content from a remote repository and immediately update the local repository to match that content
+- `git init` - Creates a new Git repository
+- `git status` - Displays the state of the working directory and the staging area
+- `git add` - Adds a change in the working directory to the staging area
+- `git commit` - Captures a snapshot of the project's currently staged changes
+- `git push` - Uploads local repository content to a remote repository
+- `git pull` - Fetches and downloads content from a remote repository and immediately updates the local repository to match that content
 
 
 #### Assignment Screenshots:
