@@ -176,3 +176,87 @@ SHOW WARNINGS;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+-- -----------------------------------------------------
+-- Data for table `csp21b`.`job`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `csp21b`;
+INSERT INTO `csp21b`.`job` (`job_id`, `job_title`, `job_notes`) VALUES (DEFAULT, 'Software Engineer', NULL);
+INSERT INTO `csp21b`.`job` (`job_id`, `job_title`, `job_notes`) VALUES (DEFAULT, 'Data Analyst', NULL);
+INSERT INTO `csp21b`.`job` (`job_id`, `job_title`, `job_notes`) VALUES (DEFAULT, 'Project Manager', NULL);
+INSERT INTO `csp21b`.`job` (`job_id`, `job_title`, `job_notes`) VALUES (DEFAULT, 'System Administrator', NULL);
+INSERT INTO `csp21b`.`job` (`job_id`, `job_title`, `job_notes`) VALUES (DEFAULT, 'HR Specialist', NULL);
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `csp21b`.`employee`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `csp21b`;
+INSERT INTO `csp21b`.`employee` (`emp_id`, `job_id`, `emp_ssn`, `emp_fname`, `emp_lname`, `emp_dob`, `emp_start_date`, `emp_end_date`, `emp_salary`, `emp_street`, `emp_city`, `emp_state`, `emp_zip`, `emp_phone`, `emp_email`, `emp_notes`) VALUES (DEFAULT, 1, 123456789, 'John', 'Doe', '1985-01-15', '2020-06-01', NULL, 85000, '123 Main St', 'Springfield', 'IL', 627040123, 1234567890, 'john.doe@example.com', NULL);
+INSERT INTO `csp21b`.`employee` (`emp_id`, `job_id`, `emp_ssn`, `emp_fname`, `emp_lname`, `emp_dob`, `emp_start_date`, `emp_end_date`, `emp_salary`, `emp_street`, `emp_city`, `emp_state`, `emp_zip`, `emp_phone`, `emp_email`, `emp_notes`) VALUES (DEFAULT, 2, 987654321, 'Jane', 'Smith', '1990-02-20', '2018-09-15', '2020-04-14', 70000, '456 Oak St', 'Madison', 'WI', 537030987, 9876543210, 'jane.smith@example.com', NULL);
+INSERT INTO `csp21b`.`employee` (`emp_id`, `job_id`, `emp_ssn`, `emp_fname`, `emp_lname`, `emp_dob`, `emp_start_date`, `emp_end_date`, `emp_salary`, `emp_street`, `emp_city`, `emp_state`, `emp_zip`, `emp_phone`, `emp_email`, `emp_notes`) VALUES (DEFAULT, 3, 555667777, 'Alice', 'Johnson', '1982-12-05', '2015-03-30', NULL, 95000, '789 Pine Rd', 'Seattle', 'WA', 981010555, 5551234567, 'alice.johnson@example.com', NULL);
+INSERT INTO `csp21b`.`employee` (`emp_id`, `job_id`, `emp_ssn`, `emp_fname`, `emp_lname`, `emp_dob`, `emp_start_date`, `emp_end_date`, `emp_salary`, `emp_street`, `emp_city`, `emp_state`, `emp_zip`, `emp_phone`, `emp_email`, `emp_notes`) VALUES (DEFAULT, 4, 444556666, 'Bob', 'Williams', '1978-07-22', '2012-01-01', NULL, 80000, '321 Cedar Ave', 'Austin', 'TX', 787020444, 4445556666, 'bob.williams@example.com', NULL);
+INSERT INTO `csp21b`.`employee` (`emp_id`, `job_id`, `emp_ssn`, `emp_fname`, `emp_lname`, `emp_dob`, `emp_start_date`, `emp_end_date`, `emp_salary`, `emp_street`, `emp_city`, `emp_state`, `emp_zip`, `emp_phone`, `emp_email`, `emp_notes`) VALUES (DEFAULT, 5, 666778899, 'Eve', 'Miller', '1995-11-11', '2021-10-10', NULL, 60000, '987 Elm St', 'Denver', 'CO', 802030987, 6667788999, 'eve.miller@example.com', NULL);
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `csp21b`.`benefit`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `csp21b`;
+INSERT INTO `csp21b`.`benefit` (`ben_id`, `ben_name`, `ben_notes`) VALUES (DEFAULT, 'Health Insurance', NULL);
+INSERT INTO `csp21b`.`benefit` (`ben_id`, `ben_name`, `ben_notes`) VALUES (DEFAULT, 'Dental Insurance', NULL);
+INSERT INTO `csp21b`.`benefit` (`ben_id`, `ben_name`, `ben_notes`) VALUES (DEFAULT, 'Vision Insurance', NULL);
+INSERT INTO `csp21b`.`benefit` (`ben_id`, `ben_name`, `ben_notes`) VALUES (DEFAULT, 'Life Insurance', NULL);
+INSERT INTO `csp21b`.`benefit` (`ben_id`, `ben_name`, `ben_notes`) VALUES (DEFAULT, 'Disability Insurance', NULL);
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `csp21b`.`plan`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `csp21b`;
+INSERT INTO `csp21b`.`plan` (`pln_id`, `emp_id`, `ben_id`, `pln_type`, `pln_cost`, `pln_election_date`, `pln_notes`) VALUES (DEFAULT, 1, 1, 'Family', 150, '2021-01-01', NULL);
+INSERT INTO `csp21b`.`plan` (`pln_id`, `emp_id`, `ben_id`, `pln_type`, `pln_cost`, `pln_election_date`, `pln_notes`) VALUES (DEFAULT, 2, 2, 'Spouse', 50, '2022-05-01', NULL);
+INSERT INTO `csp21b`.`plan` (`pln_id`, `emp_id`, `ben_id`, `pln_type`, `pln_cost`, `pln_election_date`, `pln_notes`) VALUES (DEFAULT, 3, 3, 'Single', 25, '2023-03-01', NULL);
+INSERT INTO `csp21b`.`plan` (`pln_id`, `emp_id`, `ben_id`, `pln_type`, `pln_cost`, `pln_election_date`, `pln_notes`) VALUES (DEFAULT, 4, 4, 'Family', 200, '2021-07-01', NULL);
+INSERT INTO `csp21b`.`plan` (`pln_id`, `emp_id`, `ben_id`, `pln_type`, `pln_cost`, `pln_election_date`, `pln_notes`) VALUES (DEFAULT, 5, 5, 'Family', 180, '2022-11-01', NULL);
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `csp21b`.`emp_hist`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `csp21b`;
+INSERT INTO `csp21b`.`emp_hist` (`eht_id`, `emp_id`, `eht_date`, `eht_type`, `eht_job_id`, `eht_emp_salary`, `eht_usr_changed`, `eht_reason`, `eht_notes`) VALUES (DEFAULT, 1, '2022-06-01 09:00:00', 'i', 1, 87000, 'test', 'Promotion', NULL);
+INSERT INTO `csp21b`.`emp_hist` (`eht_id`, `emp_id`, `eht_date`, `eht_type`, `eht_job_id`, `eht_emp_salary`, `eht_usr_changed`, `eht_reason`, `eht_notes`) VALUES (DEFAULT, 2, '2021-03-01 10:00:00', 'u', 2, 70000, 'test', 'Demotion ', NULL);
+INSERT INTO `csp21b`.`emp_hist` (`eht_id`, `emp_id`, `eht_date`, `eht_type`, `eht_job_id`, `eht_emp_salary`, `eht_usr_changed`, `eht_reason`, `eht_notes`) VALUES (DEFAULT, 3, '2020-12-15 15:30:00', 'i', 3, 97000, 'test', 'New hire', NULL);
+INSERT INTO `csp21b`.`emp_hist` (`eht_id`, `emp_id`, `eht_date`, `eht_type`, `eht_job_id`, `eht_emp_salary`, `eht_usr_changed`, `eht_reason`, `eht_notes`) VALUES (DEFAULT, 4, '2019-08-20 11:45:00', 'u', 4, 82000, 'test', 'Annual salary adjustment', NULL);
+INSERT INTO `csp21b`.`emp_hist` (`eht_id`, `emp_id`, `eht_date`, `eht_type`, `eht_job_id`, `eht_emp_salary`, `eht_usr_changed`, `eht_reason`, `eht_notes`) VALUES (DEFAULT, 5, '2021-10-10 08:00:00', 'i', 5, 60000, 'test', 'Annual salary adjustment', NULL);
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `csp21b`.`dependent`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `csp21b`;
+INSERT INTO `csp21b`.`dependent` (`dep_id`, `emp_id`, `dep_added`, `dep_ssn`, `dep_fname`, `dep_lname`, `dep_dob`, `dep_relation`, `dep_street`, `dep_city`, `dep_state`, `dep_zip`, `dep_phone`, `dep_email`, `dep_notes`) VALUES (DEFAULT, 1, '2021-01-01', 111223333, 'Emma', 'Doe', '2010-03-25', 'Daughter', '123 Main St', 'Springfield', 'IL', 627040123, 1234567890, NULL, NULL);
+INSERT INTO `csp21b`.`dependent` (`dep_id`, `emp_id`, `dep_added`, `dep_ssn`, `dep_fname`, `dep_lname`, `dep_dob`, `dep_relation`, `dep_street`, `dep_city`, `dep_state`, `dep_zip`, `dep_phone`, `dep_email`, `dep_notes`) VALUES (DEFAULT, 2, '2022-05-01', 222334444, 'Tom', 'Smith', '2013-05-18', 'Son', '456 Oak St', 'Madison', 'WI', 537030987, 9876543210, NULL, NULL);
+INSERT INTO `csp21b`.`dependent` (`dep_id`, `emp_id`, `dep_added`, `dep_ssn`, `dep_fname`, `dep_lname`, `dep_dob`, `dep_relation`, `dep_street`, `dep_city`, `dep_state`, `dep_zip`, `dep_phone`, `dep_email`, `dep_notes`) VALUES (DEFAULT, 3, '2023-03-01', 333445555, 'Liam', 'Johnson', '2016-08-12', 'Son', '789 Pine Rd', 'Seattle', 'WA', 981010555, 5551234567, NULL, NULL);
+INSERT INTO `csp21b`.`dependent` (`dep_id`, `emp_id`, `dep_added`, `dep_ssn`, `dep_fname`, `dep_lname`, `dep_dob`, `dep_relation`, `dep_street`, `dep_city`, `dep_state`, `dep_zip`, `dep_phone`, `dep_email`, `dep_notes`) VALUES (DEFAULT, 4, '2021-07-01', 444556666, 'Sophia', 'Williams', '2008-12-20', 'Daughter', '321 Cedar Ave', 'Austin', 'TX', 787020444, 4445556666, NULL, NULL);
+INSERT INTO `csp21b`.`dependent` (`dep_id`, `emp_id`, `dep_added`, `dep_ssn`, `dep_fname`, `dep_lname`, `dep_dob`, `dep_relation`, `dep_street`, `dep_city`, `dep_state`, `dep_zip`, `dep_phone`, `dep_email`, `dep_notes`) VALUES (DEFAULT, 5, '2022-11-01', 555667777, 'Mia', 'Miller', '2015-02-10', 'Daughter', '987 Elm St', 'Denver', 'CO', 802030987, 6667788999, NULL, NULL);
+
+COMMIT;
+

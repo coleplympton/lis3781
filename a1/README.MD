@@ -9,7 +9,7 @@
 1. Distributed Version Control with Git and Bitbucket
 2. AMPPS Installation
 3. Questions 
-4. Entity Relationship Diagram, and SQL Code 
+4. Entity Relationship Diagram, and SQL Code [lis3781_a1_solutions.sql](lis3781_a1_solutions.sql "lis3781_a1_solutions.sql")
 
 
 # A1 Database Business Rules:
@@ -56,10 +56,11 @@ The human resource (HR) department of the ACME company wants to contract a datab
 
 ![A1 ERD Screenshot](ss/a1_erd.png)
 
-
 #### Screenshot of AMPPS Install:
 ![AMPPS Install](ss/a1_ampps.png)
 
+#### Screenshot of A1 Ex1:
+![A1 Ex1](ss/a1_query.png)
 
 
 
