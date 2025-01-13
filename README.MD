@@ -11,3 +11,5 @@
     - Provide screenshots of installations
     - Create BitBucket Repo
     - Create ERD with given buisness rules
+    - Forward Engineer the data model
+    - Provide atleast one query solution
