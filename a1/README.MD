@@ -53,16 +53,22 @@ The human resource (HR) department of the ACME company wants to contract a datab
 #### Assignment Screenshots:
 
 #### Screenshot of A1 ERD:
-
-![A1 ERD Screenshot](ss/a1_erd.png)
+![A1 ERD Screenshot](img/a1_erd.png)
 
 #### Screenshot of AMPPS Install:
-![AMPPS Install](ss/a1_ampps.png)
+![AMPPS Install](img/a1_ampps.png)
 
-#### Screenshot of A1 Ex1:
-![A1 Ex1](ss/a1_query.png)
+#### Screenshot of A1 Query 1:
+![A1 Query 1](img/a1_1query.png)
 
+#### Screenshot of A1 Query 2:
+![A1 Query 2](img/a1_2query.png)
 
+#### Screenshot of A1 Query 3:
+![A1 Query 3](img/a1_3query.png)
 
+#### Screenshot of A1 Query 4:
+![A1 Query 4](img/a1_4query.png)
 
-
+#### Screenshot of A1 Query 5:
+![A1 Query 5](img/a1_5query.png)
