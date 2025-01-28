@@ -4,7 +4,7 @@
 
 ### Assignment 1 Requirements:
 
-*Five Parts:*
+*Four Parts:*
 
 1. Distributed Version Control with Git and Bitbucket
 2. AMPPS Installation
@@ -61,26 +61,3 @@ The human resource (HR) department of the ACME company wants to contract a datab
 #### Screenshot of A1 Query 1:
 ![A1 Query 1](img/a1_1query.png)
 
-#### Screenshot of A1 Query 2:
-![A1 Query 2](img/a1_2query.png)
-
-#### Screenshot of A1 Query 3:
-![A1 Query 3](img/a1_3query.png)
-
-#### Screenshot of A1 Query 4:
-![A1 Query 4](img/a1_4query.png)
-
-#### Screenshot of A1 Query 5:
-![A1 Query 5](img/a1_5query.png)
-
-#### Screenshot of A1 Query 6:
-![A1 Query 6](img/a1_6query.png)
-
-#### Screenshot of A1 Query 7:
-![A1 Query 7](img/a1_7query.png)
-
-#### Screenshot of A1 Query 8:
-![A1 Query 8](img/a1_8query.png)
-
-#### Screenshot of A1 Query 9:
-![A1 Query 9](img/a1_9query.png)

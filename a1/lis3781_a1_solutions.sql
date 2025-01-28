@@ -260,3 +260,156 @@ INSERT INTO `csp21b`.`dependent` (`dep_id`, `emp_id`, `dep_added`, `dep_ssn`, `d
 
 COMMIT;
 
+-- 1
+SELECT
+    emp_id,
+    emp_fname,
+    emp_lname,
+    CONCAT(emp_street, ", ", emp_city, ", ", emp_state, " ", SUBSTRING(emp_zip, 1, 5), "-", SUBSTRING(emp_zip, 6, 4)) AS address,
+    CONCAT("(", SUBSTRING(emp_phone, 1, 3), ") ", SUBSTRING(emp_phone, 4, 3), "-", SUBSTRING(emp_phone, 7, 4)) AS phone_num,
+    CONCAT(SUBSTRING(emp_ssn, 1, 3), "-", SUBSTRING(emp_ssn, 4, 2), "-", SUBSTRING(emp_ssn, 6, 4)) AS emp_ssn,
+    job_title
+FROM
+    job AS j, employee AS e
+WHERE
+    j.job_id = e.job_id
+ORDER BY
+    emp_lname DESC;
+
+-- 2
+SELECT
+    e.emp_id,
+    e.emp_fname,
+    e.emp_lname,
+    h.eht_date,
+    h.eht_job_id,
+    j.job_title,
+    h.eht_emp_salary,
+    h.eht_notes
+FROM
+    employee e,
+    emp_hist h,
+    job j
+WHERE
+    e.emp_id = h.emp_id
+    AND h.eht_job_id = j.job_id
+ORDER BY
+    e.emp_id,
+    h.eht_date;
+
+--3
+SELECT
+    employee.emp_fname,
+    employee.emp_lname,
+    employee.emp_dob,
+    TIMESTAMPDIFF(YEAR, employee.emp_dob, CURDATE()) AS emp_age,
+    dependent.dep_fname,
+    dependent.dep_lname,
+    dependent.dep_relation,
+    dependent.dep_dob,
+    TIMESTAMPDIFF(YEAR, dependent.dep_dob, CURDATE()) AS dep_age
+FROM
+    employee
+    NATURAL JOIN dependent
+ORDER BY
+    employee.emp_lname;
+
+--4
+START TRANSACTION;
+
+SELECT * FROM job;
+
+UPDATE job
+SET job_title = 'owner'
+WHERE job_id = 1;
+
+SELECT * FROM job;
+
+--5 
+DELIMITER //
+
+CREATE PROCEDURE insert_benefit()
+BEGIN
+    SELECT * FROM benefit;
+
+    INSERT INTO benefit
+    (ben_name, ben_notes)
+    VALUES
+    ('new benefit', 'testing');
+
+    SELECT * FROM benefit;
+END //
+
+DELIMITER ;
+
+CALL insert_benefit();
+
+--6
+SELECT
+    emp_id,
+    emp_fname,
+    emp_lname,
+    emp_ssn,
+    emp_email,
+    dep_lname,
+    dep_fname,
+    dep_ssn,
+    dep_street,
+    emp_city,
+    dep_state,
+    emp_zip,
+    dep_phone
+FROM
+    employee
+    NATURAL LEFT OUTER JOIN dependent
+ORDER BY
+    emp_lname;
+
+SELECT
+    emp_id,
+    CONCAT(emp_lname, ', ', emp_fname) AS employee,
+    CONCAT(SUBSTRING(emp_ssn, 1, 3), '-', SUBSTRING(emp_ssn, 4, 2), '-', SUBSTRING(emp_ssn, 6, 4)) AS emp_ssn,
+    emp_email AS email,
+    CONCAT(dep_lname, ', ', dep_fname) AS dependent,
+    CONCAT(SUBSTRING(dep_ssn, 1, 3), '-', SUBSTRING(dep_ssn, 4, 2), '-', SUBSTRING(dep_ssn, 6, 4)) AS dep_ssn,
+    CONCAT(dep_street, ', ', emp_city, ', ', dep_state, ' ', SUBSTRING(emp_zip, 1, 5), '-', SUBSTRING(emp_zip, 6, 4)) AS address,
+    CONCAT('(', SUBSTRING(dep_phone, 1, 3), ') ', SUBSTRING(dep_phone, 4, 3), '-', SUBSTRING(dep_phone, 7, 4)) AS phone_num
+FROM
+    employee
+    NATURAL LEFT OUTER JOIN dependent
+ORDER BY
+    emp_lname;
+
+--7
+DELIMITER //
+
+CREATE TRIGGER trg_employee_after_insert
+AFTER INSERT ON employee
+FOR EACH ROW
+BEGIN
+    INSERT INTO emp_hist
+    (eht_id, eht_date, eht_type, eht_job_id, eht_emp_salary, eht_usr_changed, eht_reason, eht_notes)
+    VALUES
+    (NEW.emp_id, NOW(), 'I', NEW.job_id, NEW.emp_salary, USER(), 'new employee', NEW.emp_notes);
+END //
+
+DELIMITER ;
+
+INSERT INTO employee
+(emp_id, job_id, emp_ssn, emp_fname, emp_lname, emp_dob, emp_start_date, emp_end_date, emp_salary, emp_street, emp_city, emp_state, emp_zip, emp_phone, emp_email, emp_notes)
+VALUES
+(3, 123456689, 'Rocky', 'Balboa', '1976-07-25', '1999-01-01', NULL, 59000.00, '457 Mockingbird Ln', 'Boise', 'ID', 837074532, 987654321, 'rbalboa@aol.com', 'meat packer');
+
+--8
+SELECT COUNT(eht_id), eht_job_id
+FROM emp_hist
+GROUP BY eht_job_id
+ORDER BY COUNT(eht_id), eht_job_id DESC;
+
+--9
+SELECT COUNT(eht_id), eht_job_id
+FROM emp_hist
+GROUP BY eht_job_id
+HAVING COUNT(eht_id) > 1
+ORDER BY eht_job_id;
+
