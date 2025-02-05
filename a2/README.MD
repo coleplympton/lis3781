@@ -23,5 +23,5 @@
 ![A2 SQL Screenshot](img/a2_b_screensht.png)
 
 #### Screenshot of A2 Populated Tables:
-![A2 Populated Tables](img/populated_tables_screensh.png)
+![A2 Populated Tables](img/populated_tables.png)
 
