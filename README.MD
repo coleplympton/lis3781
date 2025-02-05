@@ -14,7 +14,11 @@
     - Forward Engineer the data model
     - Provide atleast one query solution
 
-2. [A2 README.md](a2/README.md "My A2 README.md file")
+2. [A2 README.md](a2/README.MD "My A2 README.md file")
+    - Create `lis3781_a2_solutions.sql` including **table creation, data insertion, indexes, and foreign keys**.
+    - Implement **user privileges**, restricting `user1` and `user2` access as per assignment instructions.
+    - Execute **query verification**, checking access restrictions and preventing unauthorized actions.
+    - Provide **screenshots** of SQL queries, populated tables, and permission errors.
 
 3. [A3 README.md](a3/README.md "My A3 README.md file")
 
