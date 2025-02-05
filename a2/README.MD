@@ -25,7 +25,12 @@
 ![A2 User Privileges Screenshot](img/a2_user_privileges.png)
 
 #### Screenshot of A2 Query Verification (Permission Errors):
-![A2 Query Verification Screenshot](img/a2_query_verification.png)
+- **User1 INSERT into `company` (Failed)**  
+  ![User1 Insert Error](img/a2_user1_insert_fail.png)
+- **User2 SELECT from `company` (Failed)**  
+  ![User2 Select Error](img/a2_user2_select_fail.png)
+- **User2 DELETE from `customer` (Failed)**  
+  ![User2 Delete Error](img/a2_user2_delete_fail.png)
 
 #### Screenshot of A2 Table Removal:
 ![A2 Table Removal Screenshot](img/a2_table_removal.png)
