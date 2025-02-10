@@ -18,6 +18,9 @@
 ![A2 SQL Screenshot](img/a2_b_sql.png)
 ![A2 SQL Screenshot](img/a2_c_sql.png)
 
+#### Screenshot of A2 Created Users Permissions:
+![A2 SQL Screenshot](img/a2_created_users_permissions.png)
+
 #### Screenshot of A2 Populated Tables:
 ![A2 Populated Tables](img/populated_tables.png)
 
