@@ -106,3 +106,36 @@ SHOW GRANTS FOR 'user1'@'localhost';
 
 -- Verify user2 privileges
 SHOW GRANTS FOR 'user2'@'localhost';
+
+-- Step 4: Display Current User2 and MySQL Version
+SELECT CURRENT_USER() AS current_user, VERSION() AS mysql_version;
+
+-- Step 5: List Tables (as admin)
+SHOW TABLES;
+
+-- Step 6: Display Structures for Both Tables (as admin)
+DESCRIBE company;
+DESCRIBE customer;
+
+-- Step 7: Display Data for Both Tables
+SELECT * FROM company;
+SELECT * FROM customer;
+
+-- Step 8: Log in as user1 and Attempt Unauthorized INSERT Operations
+INSERT INTO company 
+    (cmp_type, cmp_street, cmp_city, cmp_state, cmp_zip, cmp_phone, cmp_ytd_sales, cmp_url, cmp_notes)
+VALUES 
+    ('LLC', '123 Test St', 'Test City', 'TC', '123456789', 1234567890, 1000.00, 'http://test.com', 'User1 insert attempt');
+
+INSERT INTO customer 
+    (cmp_id, cus_ssn, cus_salt, cus_type, cus_first, cus_last, cus_street, cus_city, cus_state, cus_zip, cus_phone, cus_email, cus_balance, cus_tot_sales, cus_notes)
+VALUES 
+    (1, UNHEX(SHA2(CONCAT(RANDOM_BYTES(64), '000000000'), 512)), RANDOM_BYTES(64), 'Loyal', 'Jane', 'Doe', '456 Sample Rd', 'Sample City', 'SC', '987654321', 9876543210, 'jane.doe@example.com', 200.00, 300.00, 'User1 insert attempt');
+
+-- Step 9: Log in as user2 and Attempt Unauthorized Operations
+SELECT * FROM company;
+DELETE FROM customer WHERE cus_id = 1;
+
+-- Step 10: Log in as Admin and Remove Both Tables (Structure and Data)
+DROP TABLE IF EXISTS company;
+DROP TABLE IF EXISTS customer;
