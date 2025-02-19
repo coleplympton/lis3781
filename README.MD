@@ -21,6 +21,10 @@
     - Provide **screenshots** of SQL queries, populated tables, and permission errors.
 
 3. [A3 README.md](a3/README.md "My A3 README.md file")
+    - Log into Oracle Server using RemoteLabs and set up **Oracle SQL Developer Login**.
+    - Create and populate **Oracle tables**, ensuring they match the assignment specifications.
+    - Execute and verify **query results**, ensuring correct SQL outputs for required reports.
+    - Provide **screenshots** of SQL queries, populated tables, and at least one required report.
 
 4. [A4 README.md](a4/README.md "My A4 README.md file")
 
