@@ -17,7 +17,6 @@
 
 4. **SQL Code & Documentation**  
    - Save all SQL commands in [lis3781_a3_solutions.sql](lis3781_a3_solutions.sql "lis3781_a3_solutions.sql").
-   - Provide screenshots in `README.md` as per assignment instructions.
 
 #### Assignment Screenshots:
 
@@ -29,7 +28,7 @@
 #### Screenshot of Populated Tables:
 ![A3 Populated Tables](img/a3_populated_tables.png)
 
-#### Screenshot of Required Report & SQL Code Solution:
+#### Screenshot of Required Report & SQL Code Solution #8. List customer details:
 ![A3 Report](img/a3_report_8.png)
 
 #### Link to Full SQL File:
