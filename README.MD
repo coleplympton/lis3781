@@ -1,6 +1,6 @@
 # LIS3781 - Advanced Database Management
 
-## Cole Plympton Test test
+## Cole Plympton 
 
 ### LIS3781 Requirements:
 
