@@ -7,12 +7,12 @@
 *Course Work Links:*
 
 1. [A1 README.md](a1/README.MD "My A1 README.md file")
-    - Install AMPPS
+    - Install **AMPPS**
     - Provide screenshots of installations
-    - Create BitBucket Repo
-    - Create ERD with given buisness rules
-    - Forward Engineer the data model
-    - Provide atleast one query solution
+    - Create **BitBucket** Repo
+    - **Create ERD** with given buisness rules
+    - **Forward Engineer** the data model
+    - Provide atleast **one query solution**
 
 2. [A2 README.md](a2/README.MD "My A2 README.md file")
     - Create `lis3781_a2_solutions.sql` including **table creation, data insertion, indexes, and foreign keys**.
