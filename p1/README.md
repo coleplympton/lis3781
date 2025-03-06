@@ -23,8 +23,9 @@
 #### Screenshot of Populated Tables (11):
 ![P1 Populated Tables](img/p1_populated_tables.png)
 
-#### Screenshot of Required Report & SQL Code Solution:
+#### Screenshot of Report 1 & SQL Code Solution:
 ![P1 Report](img/p1_report.png)
+![Code Solution](img/report_code.png)
 
 #### Link to Full SQL File:
 [lis3781_p1_solutions.sql](lis3781_p1_solutions.sql "lis3781_p1_solutions.sql")
