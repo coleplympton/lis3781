@@ -26,10 +26,16 @@
     - Execute and verify **query results**, ensuring correct SQL outputs for required reports.
     - Provide **screenshots** of SQL queries, populated tables, and at least one required report.
 
-4. [A4 README.md](a4/README.md "My A4 README.md file")
+4. [P1 README.md](p1/README.md "My P1 README.md file")
+    - Create an **Entity-Relationship Diagram (ERD)** for a local municipality court case database system
+    - Forward-engineer the ERD to create **MySQL tables** with proper relationships
+    - Implement **security features** like SHA2 hashing with salt for SSNs
+    - Create required **views, stored procedures, and triggers** for database functionality
 
-5. [A5 README.md](a5/README.md "My A5 README.md file")
+5. [A4 README.md](a4/README.md "My A4 README.md file")
 
-6. [A6 README.md](a6/README.md "My A6 README.md file")
+6. [A5 README.md](a5/README.md "My A5 README.md file")
 
-7. [A7 README.md](a7/README.md "My A7 README.md file")
+7. [A6 README.md](a6/README.md "My A6 README.md file")
+
+8. [A7 README.md](a7/README.md "My A7 README.md file")
