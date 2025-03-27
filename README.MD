@@ -33,6 +33,10 @@
     - Create required **views, stored procedures, and triggers** for database functionality
 
 5. [A4 README.md](a4/README.md "My A4 README.md file")
+    - Create and implement **MS SQL Server database** with proper constraints using RemoteLabs
+    - Apply **data validation** for special fields (ZIP codes, phone numbers, SSN hashing)
+    - Configure **referential integrity** with cascading updates and deletes
+    - Provide **screenshots** of ERD, populated tables, and SQL query results
 
 6. [A5 README.md](a5/README.md "My A5 README.md file")
 
