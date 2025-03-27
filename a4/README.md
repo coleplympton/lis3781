@@ -27,4 +27,3 @@
 #### Link to SQL Solutions File:
 [lis3781_a4_solutions.sql](lis3781_a4_solutions.sql "lis3781_a4_solutions.sql")
 
-Note: No credit will be given if tables and data are not populated in RemoteLabs MS SQL Server.
