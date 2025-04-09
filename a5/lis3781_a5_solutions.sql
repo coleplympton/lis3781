@@ -1,4 +1,4 @@
--- MS SQL Server
+ -- MS SQL Server
 
 /* 
 NOTES: Tables *must* include the following constraints and defaults:
@@ -66,6 +66,7 @@ CREATE TABLE dbo.person
 (
   per_id SMALLINT not null identity(1,1),
   per_ssn binary(64) NULL,
+  per_salt binary(64) NULL,
   per_fname VARCHAR(15) NOT NULL,
   per_lname VARCHAR(30) NOT NULL,
   per_gender CHAR(1) NOT NULL CHECK (per_gender IN('m', 'f')),
@@ -235,26 +236,94 @@ CREATE TABLE dbo.[order]
 );
 
 ----------------------------------------
+-- Table region
+----------------------------------------
+IF OBJECT_ID(N'dbo.region', N'U') IS NOT NULL
+DROP TABLE dbo.region;
+GO
+
+CREATE TABLE region
+(
+    reg_id    TINYINT NOT NULL identity(1,1),
+    reg_name  CHAR(1) NOT NULL,  -- n,e,s,w,c (north, east, south, west, central)
+    reg_notes VARCHAR(255) NULL,
+    PRIMARY KEY (reg_id)
+);
+GO
+
+----------------------------------------
+-- Table state
+----------------------------------------
+IF OBJECT_ID(N'dbo.state', N'U') IS NOT NULL
+DROP TABLE dbo.state;
+GO
+
+CREATE TABLE dbo.state
+(
+    ste_id    TINYINT NOT NULL identity(1,1),
+    reg_id    TINYINT NOT NULL,
+    ste_name  CHAR(2) NOT NULL DEFAULT 'FL',
+    ste_notes VARCHAR(255) NULL,
+    PRIMARY KEY (ste_id),
+
+    CONSTRAINT fk_state_region
+        FOREIGN KEY (reg_id)
+        REFERENCES dbo.region (reg_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+GO
+
+----------------------------------------
+-- Table city
+----------------------------------------
+IF OBJECT_ID(N'dbo.city', N'U') IS NOT NULL
+DROP TABLE dbo.city;
+GO
+
+CREATE TABLE dbo.city
+(
+    cty_id    SMALLINT NOT NULL identity(1,1),
+    ste_id    TINYINT NOT NULL,
+    cty_name  VARCHAR(30) NOT NULL,
+    cty_notes VARCHAR(255) NULL,
+    PRIMARY KEY (cty_id),
+
+    CONSTRAINT fk_city_state
+        FOREIGN KEY (ste_id)
+        REFERENCES dbo.state (ste_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+GO
+
+----------------------------------------
 -- Table store
 ----------------------------------------
-IF OBJECT_ID (N'dbo.store', N'U') IS NOT NULL
+IF OBJECT_ID(N'dbo.store', N'U') IS NOT NULL
 DROP TABLE dbo.store;
 GO
 
 CREATE TABLE dbo.store
 (
-    str_id SMALLINT NOT NULL identity(1,1),
-    str_name VARCHAR(45) NOT NULL,
+    str_id     SMALLINT NOT NULL identity(1,1),
+    cty_id     SMALLINT NOT NULL,
+    str_name   VARCHAR(45) NOT NULL,
     str_street VARCHAR(30) NOT NULL,
-    str_city VARCHAR(30) NOT NULL,
-    str_state CHAR(2) NOT NULL DEFAULT 'FL',
-    str_zip int NOT NULL check (str_zip like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
-    str_phone bigint NOT NULL check (str_phone like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
-    str_email VARCHAR(100) NOT NULL,
-    str_url VARCHAR(100) NOT NULL,
-    str_notes VARCHAR(255) NULL,
-    PRIMARY KEY (str_id)
+    str_zip    INT NOT NULL CHECK (str_zip LIKE '[0-9][0-9][0-9][0-9][0-9]'),
+    str_phone  BIGINT NOT NULL CHECK (str_phone LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
+    str_email  VARCHAR(100) NOT NULL,
+    str_url    VARCHAR(100) NOT NULL,
+    str_notes  VARCHAR(255) NULL,
+    PRIMARY KEY (str_id),
+
+    CONSTRAINT fk_store_city
+        FOREIGN KEY (cty_id)
+        REFERENCES dbo.city (cty_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
+GO
 
 ----------------------------------------
 -- Table invoice
@@ -419,6 +488,76 @@ CREATE TABLE dbo.order_line
         ON UPDATE CASCADE
 );
 
+----------------------------------------
+-- Table time
+----------------------------------------
+IF OBJECT_ID(N'dbo.time', N'U') IS NOT NULL
+DROP TABLE dbo.time;
+GO
+
+CREATE TABLE dbo.time
+(
+    tim_id     INT NOT NULL identity(1,1),
+    tim_yr     SMALLINT NOT NULL, -- 2 byte integer (no YEAR data type in MS SQL Server)
+    tim_qtr    TINYINT NOT NULL,  -- 1 - 4
+    tim_month  TINYINT NOT NULL,  -- 1 - 12
+    tim_week   TINYINT NOT NULL,  -- 1 - 52
+    tim_day    TINYINT NOT NULL,  -- 1 - 7
+    tim_time   TIME NOT NULL,     -- based on 24-hour clock
+    tim_notes  VARCHAR(255) NULL,
+    PRIMARY KEY (tim_id)
+);
+GO
+
+----------------------------------------
+-- Table sale
+----------------------------------------
+IF OBJECT_ID(N'dbo.sale', N'U') IS NOT NULL
+DROP TABLE dbo.sale;
+GO
+
+CREATE TABLE dbo.sale
+(
+    pro_id     SMALLINT NOT NULL,
+    str_id     SMALLINT NOT NULL,
+    cnt_id     INT NOT NULL,
+    tim_id     INT NOT NULL,
+    sal_qty    SMALLINT NOT NULL,
+    sal_price  DECIMAL(8,2) NOT NULL,
+    sal_total  DECIMAL(8,2) NOT NULL,
+    sal_notes  VARCHAR(255) NULL,
+    PRIMARY KEY (pro_id, cnt_id, tim_id, str_id),
+
+    -- make sure combination of time, contact, store, and product are unique
+    CONSTRAINT ux_pro_id_str_id_cnt_id_tim_id
+        UNIQUE NONCLUSTERED (pro_id ASC, str_id ASC, cnt_id ASC, tim_id ASC),
+
+    CONSTRAINT fk_sale_time
+        FOREIGN KEY (tim_id)
+        REFERENCES dbo.time (tim_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_sale_contact
+        FOREIGN KEY (cnt_id)
+        REFERENCES dbo.contact (cnt_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_sale_store
+        FOREIGN KEY (str_id)
+        REFERENCES dbo.store (str_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_sale_product
+        FOREIGN KEY (pro_id)
+        REFERENCES dbo.product (pro_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+GO
+
 SELECT * FROM information_schema.tables;
 
 -- converts to binary
@@ -432,18 +571,18 @@ SELECT len(HASHBYTES('SHA2_512', 'test'));
 -- NOTE: do *not* include attribute name or value for auto increment attributes (i.e., pks)
 -- ----------------------------------------------
 INSERT INTO dbo.person
-(per_ssn, per_fname, per_lname, per_gender, per_dob, per_street, per_city, per_state, per_zip, per_email, per_type, per_notes)
+(per_ssn, per_salt, per_fname, per_lname, per_gender, per_dob, per_street, per_city, per_state, per_zip, per_email, per_type, per_notes)
 VALUES
-(HASHBYTES('SHA2_512', 'test1'), 'Michael', 'Johnson', 'm', '1985-04-17', '123 Maple Street', 'Chicago', 'IL', 606012345, 'mjohnson@gmail.com', 's', 'Senior sales rep'),
-(HASHBYTES('SHA2_512', 'test2'), 'Jennifer', 'Williams', 'f', '1979-11-30', '456 Oak Avenue', 'Boston', 'MA', 221201234, 'jwilliams@outlook.com', 's', 'Northeast territory'),
-(HASHBYTES('SHA2_512', 'test3'), 'David', 'Martinez', 'm', '1990-08-22', '789 Pine Road', 'Austin', 'TX', 787011234, 'dmartinez@yahoo.com', 's', 'New hire 2023'),
-(HASHBYTES('SHA2_512', 'test4'), 'Sarah', 'Garcia', 'f', '1982-05-15', '321 Cedar Lane', 'Portland', 'OR', 972011234, 'sgarcia@hotmail.com', 's', 'Western sales manager'),
-(HASHBYTES('SHA2_512', 'test5'), 'Robert', 'Taylor', 'm', '1975-09-03', '654 Birch Court', 'Denver', 'CO', 802011234, 'rtaylor@gmail.com', 's', 'Top performer 2024'),
-(HASHBYTES('SHA2_512', 'test6'), 'Emily', 'Anderson', 'f', '1988-07-19', '987 Redwood Drive', 'Phoenix', 'AZ', 850151234, 'eanderson@yahoo.com', 'c', 'Premium customer'),
-(HASHBYTES('SHA2_512', 'test7'), 'Christopher', 'Thomas', 'm', '1971-12-05', '159 Spruce Street', 'Nashville', 'TN', 372011234, 'cthomas@outlook.com', 'c', 'Since 2018'),
-(HASHBYTES('SHA2_512', 'test8'), 'Jessica', 'White', 'f', '1995-03-28', '753 Elm Boulevard', 'Miami', 'FL', 331301234, 'jwhite@gmail.com', 'c', 'Monthly subscription'),
-(HASHBYTES('SHA2_512', 'test9'), 'Daniel', 'Harris', 'm', '1980-01-14', '246 Aspen Way', 'San Diego', 'CA', 921001234, 'dharris@hotmail.com', 'c', 'High-volume orders'),
-(HASHBYTES('SHA2_512', 'test10'), 'Amanda', 'Martin', 'f', '1992-06-08', '135 Willow Path', 'Atlanta', 'GA', 303041234, 'amartin@yahoo.com', 'c', 'New account 2024');
+(1, NULL, 'Michael', 'Johnson', 'm', '1985-04-17', '123 Maple Street', 'Chicago', 'IL', 606012345, 'mjohnson@gmail.com', 's', 'Senior sales rep'),
+(2, NULL, 'Jennifer', 'Williams', 'f', '1979-11-30', '456 Oak Avenue', 'Boston', 'MA', 221201234, 'jwilliams@outlook.com', 's', 'Northeast territory'),
+(3, NULL,  'David', 'Martinez', 'm', '1990-08-22', '789 Pine Road', 'Austin', 'TX', 787011234, 'dmartinez@yahoo.com', 's', 'New hire 2023'),
+(4, NULL,  'Sarah', 'Garcia', 'f', '1982-05-15', '321 Cedar Lane', 'Portland', 'OR', 972011234, 'sgarcia@hotmail.com', 's', 'Western sales manager'),
+(5, NULL, 'Robert', 'Taylor', 'm', '1975-09-03', '654 Birch Court', 'Denver', 'CO', 802011234, 'rtaylor@gmail.com', 's', 'Top performer 2024'),
+(6, NULL, 'Emily', 'Anderson', 'f', '1988-07-19', '987 Redwood Drive', 'Phoenix', 'AZ', 850151234, 'eanderson@yahoo.com', 'c', 'Premium customer'),
+(7, NULL, 'Christopher', 'Thomas', 'm', '1971-12-05', '159 Spruce Street', 'Nashville', 'TN', 372011234, 'cthomas@outlook.com', 'c', 'Since 2018'),
+(8, NULL, 'Jessica', 'White', 'f', '1995-03-28', '753 Elm Boulevard', 'Miami', 'FL', 331301234, 'jwhite@gmail.com', 'c', 'Monthly subscription'),
+(9, NULL, 'Daniel', 'Harris', 'm', '1980-01-14', '246 Aspen Way', 'San Diego', 'CA', 921001234, 'dharris@hotmail.com', 'c', 'High-volume orders'),
+(10, NULL, 'Amanda', 'Martin', 'f', '1992-06-08', '135 Willow Path', 'Atlanta', 'GA', 303041234, 'amartin@yahoo.com', 'c', 'New account 2024');
 
 select * from dbo.person;
 
@@ -503,17 +642,62 @@ VALUES
 
 select * from dbo.[order];
 
+-- ----------------------------
+-- Data for table region
+-- ----------------------------
+INSERT INTO region
+    (reg_name, reg_notes)
+VALUES
+    ('c', NULL),
+    ('n', NULL),
+    ('e', NULL),
+    ('s', NULL),
+    ('w', NULL);
+GO
+
+SELECT * FROM dbo.region;
+
+-- ----------------------------
+-- Data for table state
+-- ----------------------------
+INSERT INTO state
+    (reg_id, ste_name, ste_notes)
+VALUES
+    (1, 'MI', NULL),
+    (3, 'IL', NULL),
+    (4, 'WA', NULL),
+    (5, 'FL', NULL),
+    (2, 'TX', NULL);
+GO
+
+SELECT * FROM dbo.state;
+
+-- ----------------------------
+-- Data for table city
+-- ----------------------------
+INSERT INTO city
+    (ste_id, cty_name, cty_notes)
+VALUES
+    (1, 'Lansing', NULL),
+    (2, 'Houston', NULL),
+    (3, 'Springfield', NULL),
+    (4, 'Seattle', NULL),
+    (5, 'Orlando', NULL);
+GO
+
+SELECT * FROM dbo.city;
+
 -- ----------------------------------------------
 -- Data for table store
 -- ----------------------------------------------
 INSERT INTO dbo.store
-(str_name, str_street, str_city, str_state, str_zip, str_phone, str_email, str_url, str_notes)
+(cty_id, str_name, str_street, str_zip, str_phone, str_email, str_url, str_notes)
 VALUES
-('Target', '1250 Broadway Ave', 'Seattle', 'WA', 981012345, 2065557890, 'seattle@target.com', 'http://www.target.com', NULL),
-('Best Buy', '3450 Market Street', 'Phoenix', 'AZ', 850151234, 6025558765, 'phoenix@bestbuy.com', 'http://www.bestbuy.com', NULL),
-('Home Depot', '8975 Shiloh Road', 'Dallas', 'TX', 752291234, 2145559876, 'dallas@homedepot.com', 'http://www.homedepot.com', NULL),
-('Costco', '2150 Park Place', 'Boston', 'MA', 121081234, 6175554321, 'boston@costco.com', 'http://www.costco.com', NULL),
-('Kroger', '7625 Jefferson Blvd', 'Nashville', 'TN', 372051234, 6155552468, 'nashville@kroger.com', 'http://www.kroger.com', NULL);
+(3, 'Target', '1200 Market St', 63101, 3145556789, 'support@target.com', 'http://www.target.com', 'Opening new branch soon.'),
+(4, 'Best Buy', '200 Tech Blvd', 94107, 4159876543, 'help@bestbuy.com', 'http://www.bestbuy.com', NULL),
+(5, 'Home Depot', '333 Builder Rd', 85001, 8505553344, 'contact@homedepot.com', 'http://www.homedepot.com', 'Seasonal clearance ongoing.'),
+(1, 'Publix', '789 Grocery Ln', 32304, 8501234567, 'info@publix.com', 'http://www.publix.com', NULL),
+(2, 'Staples', '456 Office Park Dr', 10011, 2128765432, 'service@staples.com', 'http://www.staples.com', 'Store remodeled last month.');
 
 select * from dbo.store;
 
@@ -601,6 +785,56 @@ VALUES
 
 select * from dbo.product_hist;
 
+-- ----------------------------
+-- Data for table time
+-- ----------------------------
+INSERT INTO time
+    (tim_yr, tim_qtr, tim_month, tim_week, tim_day, tim_time, tim_notes)
+VALUES
+    (2020, 1, 2, 3, 1, '08:00:00', NULL),
+    (2021, 2, 5, 18, 2, '13:15:30', NULL),
+    (2022, 3, 7, 30, 5, '17:45:00', NULL),
+    (2023, 4, 10, 41, 7, '23:59:59', NULL),
+    (2024, 1, 1, 1, 3, '06:30:45', NULL);
+GO
+
+SELECT * FROM dbo.time;
+
+-- ----------------------------
+-- Data for table sale (25 unique records)
+-- ----------------------------
+INSERT INTO sale
+(pro_id, str_id, cnt_id, tim_id, sal_qty, sal_price, sal_total, sal_notes)
+VALUES
+(1, 1, 1, 1, 5, 9.99, 49.95, NULL),
+(2, 2, 2, 2, 3, 19.99, 59.97, NULL),
+(3, 3, 3, 3, 2, 5.99, 11.98, NULL),
+(4, 4, 4, 4, 1, 99.99, 99.99, NULL),
+(5, 5, 5, 5, 4, 15.99, 63.96, NULL),
+(1, 2, 2, 3, 2, 8.99, 17.98, NULL),
+(2, 3, 3, 4, 6, 7.99, 47.94, NULL),
+(3, 4, 4, 5, 1, 2.99, 2.99, NULL),
+(4, 5, 5, 1, 3, 3.99, 11.97, NULL),
+(5, 1, 1, 2, 2, 12.99, 25.98, NULL),
+(1, 3, 3, 5, 7, 13.99, 97.93, NULL),
+(2, 4, 4, 1, 6, 9.99, 59.94, NULL),
+(3, 5, 5, 2, 2, 4.99, 9.98, NULL),
+(4, 1, 1, 3, 3, 14.99, 44.97, NULL),
+(5, 2, 2, 4, 5, 6.99, 34.95, NULL),
+(1, 4, 4, 2, 1, 11.99, 11.99, NULL),
+(2, 5, 5, 3, 9, 10.99, 98.91, NULL),
+(3, 1, 1, 4, 6, 7.99, 47.94, NULL),
+(4, 2, 2, 5, 4, 8.99, 35.96, NULL),
+(5, 3, 3, 1, 8, 3.99, 31.92, NULL),
+(1, 5, 5, 4, 2, 22.99, 45.98, NULL),
+(2, 1, 1, 5, 10, 5.99, 59.90, NULL),
+(3, 2, 2, 1, 7, 6.99, 48.93, NULL),
+(4, 3, 3, 2, 5, 9.99, 49.95, NULL),
+(5, 4, 4, 3, 3, 12.99, 38.97, NULL);
+GO
+
+SELECT * FROM dbo.sale;
+
 -- ----------------------------------------------
 -- Data for table srp_hist
 -- ----------------------------------------------
@@ -614,6 +848,19 @@ VALUES
 (5, 'i', getDate(), SYSTEM_USER, getDate(), 145000, 59000, 2950, NULL);
 
 select * from dbo.srp_hist;
+
+-- ----------------------------------------------
+-- Data for table phone
+-- ----------------------------------------------
+INSERT INTO dbo.phone (per_id, phn_num, phn_type, phn_notes)
+VALUES
+(1, 8505551234, 'c', 'Personal cell phone'),
+(2, 8505552345, 'h', 'Home landline'),
+(3, 8505553456, 'w', 'Work phone for office use'),
+(4, 8505554567, 'f', 'Fax machine'),
+(5, 8505555678, 'c', 'Spare mobile phone');
+
+select * from dbo.phone;
 
 select year(sht_date) from dbo.srp_hist;
 
@@ -659,352 +906,211 @@ from dbo.invoice
 where inv_paid !=0;
 
 -- use single quotation mark to escape single quotation mark (otherwise, error), also, notice additional space for line break
--- #1 Solution: create view (sum of each customer's *paid* invoices, in desc order):
-;
-
---drop view if exists
---1st arg is object name, 2nd arg is type (V=view)
-IF OBJECT_ID (N'dbo.v_paid_invoice_total', N'V') IS NOT NULL
-DROP VIEW dbo.v_paid_invoice_total;
-GO
-
---In MS SQL SERVER: do *NOT* use ORDER BY clause in *VIEWS* (non-guaranteed behavior)
-create view dbo.v_paid_invoice_total as
-select p.per_id, per_fname, per_lname, sum(inv_total) as sum_total, FORMAT(sum(inv_total), 'C', 'en-us') as paid_invoice_total
-from dbo.person p
-join dbo.customer c on p.per_id=c.per_id
-join dbo.contact ct on c.per_id=ct.per_cid
-join dbo.[order] o on ct.cnt_id=o.cnt_id
-join dbo.invoice i on o.ord_id=i.ord_id
-where inv_paid !=0
--- must be contained in group by, if not used in aggregate function
-group by p.per_id, per_fname, per_lname
-go
-
--- display view results (order by should be used outside of view)
-select per_id, per_fname, per_lname, paid_invoice_total from dbo.v_paid_invoice_total order by sum_total desc;
-go
-
--- compare views to base tables
-SELECT * FROM information_schema.tables;
-go
-
--- Display definition of trigger, stored procedure, or view
-sp_helptext 'dbo.v_paid_invoice_total'
-go
-
--- remove view from server memory
-drop view dbo.v_paid_invoice_total;
-
--- 2) Create a stored procedure that displays all customers' outstanding balances
--- (unstored derived attribute based upon the difference of a customer's invoice total and their respective payments).
--- List their invoice totals, what was paid, and the difference.
-
--- a. individual customer (example query for a specific customer)
-SELECT 
-    p.per_id, 
-    p.per_fname, 
-    p.per_lname,
-    SUM(i.inv_total) AS total_invoice_amount,
-    SUM(pt.pay_amt) AS total_paid, 
-    SUM(i.inv_total) - SUM(pt.pay_amt) AS invoice_diff
-FROM dbo.person p
-    JOIN dbo.customer c ON p.per_id = c.per_id
-    JOIN dbo.contact ct ON c.per_id = ct.per_cid
-    JOIN dbo.[order] o ON ct.cnt_id = o.cnt_id
-    JOIN dbo.invoice i ON o.ord_id = i.ord_id
-    JOIN dbo.payment pt ON i.inv_id = pt.inv_id
-WHERE p.per_id = 7
-GROUP BY p.per_id, p.per_fname, p.per_lname;
-
--- use single quotation mark to escape single quotation mark (otherwise, error)
-PRINT '#2 Solution: create procedure (displays all customers'' outstanding balances):';
+print '#1 Solution: Create a stored procedure (product_days_of_week) listing the product names, descriptions, ' + CHAR(13)+CHAR(10) + 'and the day of the week in which they were sold, in ascending order of the day of week:'
 
 -- 1st arg is object name, 2nd arg is type (P=procedure)
-IF OBJECT_ID(N'dbo.sp_all_customers_outstanding_balances', N'P') IS NOT NULL
-    DROP PROC dbo.sp_all_customers_outstanding_balances;
+IF OBJECT_ID(N'dbo.product_days_of_week', N'P') IS NOT NULL
+    DROP PROC dbo.product_days_of_week;
 GO
 
--- In MS SQL SERVER: *can* use ORDER BY clause in stored procedures, though, *not* views
-CREATE PROC dbo.sp_all_customers_outstanding_balances AS
+CREATE PROC dbo.product_days_of_week AS
 BEGIN
-    SELECT 
-        p.per_id, 
-        p.per_fname, 
-        p.per_lname,
-        SUM(i.inv_total) AS total_invoice_amount,
-        SUM(pt.pay_amt) AS total_paid, 
-        SUM(i.inv_total) - SUM(pt.pay_amt) AS outstanding_balance
-    FROM dbo.person p
-        JOIN dbo.customer c ON p.per_id = c.per_id
-        JOIN dbo.contact ct ON c.per_id = ct.per_cid
-        JOIN dbo.[order] o ON ct.cnt_id = o.cnt_id
-        JOIN dbo.invoice i ON o.ord_id = i.ord_id
-        JOIN dbo.payment pt ON i.inv_id = pt.inv_id
-    GROUP BY p.per_id, p.per_fname, p.per_lname
-    ORDER BY outstanding_balance DESC;
-END;
+    -- DATENAME ( datepart , date )
+    -- tim_day is tinyint, not date. Compensate with offset. Sunday default start of week.
+    SELECT pro_name, pro_descript, DATENAME(dw, tim_day - 1) AS 'day_of_week'
+    FROM product p
+    JOIN sale s ON p.pro_id = s.pro_id
+    JOIN time t ON t.tim_id = s.tim_id
+    ORDER BY tim_day - 1 ASC; -- sorts numerically, rather than string return of DATENAME() function
+END
 GO
 
 -- call stored procedure
-EXEC dbo.sp_all_customers_outstanding_balances;
+EXEC dbo.product_days_of_week;
 
 -- list all procedures (e.g., stored procedures or functions) for database
-SELECT * FROM csp21b.information_schema.routines
+SELECT * 
+FROM test.information_schema.routines 
 WHERE routine_type = 'PROCEDURE';
 GO
 
--- Display definition of trigger, stored procedure, or view
-sp_helptext 'dbo.sp_all_customers_outstanding_balances';
+-- use single quotation mark to escape single quotation mark (otherwise, error), also, notice additional space for line break
+print '#2 Solution: Create a stored procedure (product_drill_down) listing the product name, quantity on hand, store name, ' + CHAR(13)+CHAR(10) +
+'city name, state name, and region name where each product was purchased, in descending order of quantity on hand:';
 GO
-
--- remove procedure from server memory
-DROP PROC dbo.sp_all_customers_outstanding_balances;
-
--- 3) Create a stored procedure that populates the sales rep history table w/sales reps' data when called.
--- list sales reps' history before/after stored procedure called
-
--- *NOTE*: BOTH tables have existing data.
--- Demonstration illustrates how to initially populate a table w/another table's data, while adding dynamically generated data.
-
--- use single quotation mark to escape single quotation mark (otherwise, error)
-PRINT '#3 Solution: create stored procedure to populate history table w/sales reps'' data when called';
 
 -- 1st arg is object name, 2nd arg is type (P=procedure)
-IF OBJECT_ID(N'dbo.sp_populate_srp_hist_table', N'P') IS NOT NULL
-    DROP PROC dbo.sp_populate_srp_hist_table;
+IF OBJECT_ID(N'dbo.product_drill_down', N'P') IS NOT NULL
+    DROP PROC dbo.product_drill_down;
 GO
 
-CREATE PROC dbo.sp_populate_srp_hist_table AS
+CREATE PROC dbo.product_drill_down AS
 BEGIN
-    INSERT INTO dbo.srp_hist
-    (per_id, sht_type, sht_modified, sht_modifier, sht_date, sht_yr_sales_goal, sht_yr_total_sales, sht_yr_total_comm, sht_notes)
-    -- mix dynamically generated data, with original sales reps' data
-    SELECT 
-        per_id, 
-        'I', 
-        GETDATE(), 
-        SYSTEM_USER, 
-        GETDATE(), 
-        srp_yr_sales_goal, 
-        srp_ytd_sales, 
-        srp_ytd_comm, 
-        srp_notes
-    FROM dbo.slsrep;
-END;
-GO
-
-PRINT 'list table data before call:';
-SELECT * FROM dbo.slsrep;
-SELECT * FROM dbo.srp_hist;
-
--- Purposefully deleting original data to simulate initially populating a "log" or history table
-DELETE FROM dbo.srp_hist;
-
--- call stored procedure (populating srp_hist table with slsrep table data)
-EXEC dbo.sp_populate_srp_hist_table;
-
-PRINT 'list table data after call:';
-SELECT * FROM dbo.slsrep;
-SELECT * FROM dbo.srp_hist;
-
--- list all procedures (e.g., stored procedures or functions) for database
-SELECT * FROM csp21b.information_schema.routines
-WHERE routine_type = 'PROCEDURE';
-GO
-
--- Display definition of trigger, stored procedure, or view
-sp_helptext 'dbo.sp_populate_srp_hist_table'
-go
-
--- remove procedure from server memory
-drop PROC dbo.sp_populate_srp_hist_table;
-go
-
--- use single quotation mark to escape single quotation mark (otherwise, error)
-print '#4 Solution: Create a trigger that automatically adds a record to the sales reps'' history table for every record added to the sales rep table.
-';
-
-/*
-Note: When using MS SQL Server triggers, there are two system tables created "Inserted" and "Deleted."
-Inserted: contains new rows for insert and update operations
-Deleted: contains original rows for update and delete operations
-*/
-
---1st arg is object name, 2nd arg is type (TR=trigger)
-IF OBJECT_ID(N'dbo.trg_sales_history_insert', N'TR') IS NOT NULL
-DROP TRIGGER dbo.trg_sales_history_insert
-GO
-
-CREATE TRIGGER dbo.trg_sales_history_insert
-ON dbo.slsrep
-AFTER INSERT AS
-BEGIN
- -- declare
- DECLARE
- @per_id_v smallint,
- @sht_type_v char(1),
- @sht_modified_v date,
- @sht_modifier_v varchar(45),
- @sht_date_v date,
- @sht_yr_sales_goal_v decimal(8,2),
- @sht_yr_total_sales_v decimal(8,2),
- @sht_yr_total_comm_v decimal(7,2),
- @sht_notes_v varchar(255);
-
- SELECT
- @per_id_v = per_id,
- @sht_type_v = 'I',
- @sht_modified_v = getDate(),
- @sht_modifier_v = SYSTEM_USER,
- @sht_date_v = getDate(),
- @sht_yr_sales_goal_v = srp_yr_sales_goal,
- @sht_yr_total_sales_v = srp_ytd_sales,
- @sht_yr_total_comm_v = srp_ytd_comm,
- @sht_notes_v = srp_notes
- FROM INSERTED;
-
- INSERT INTO dbo.srp_hist
-(per_id, sht_type, sht_modified, sht_modifier, sht_date, sht_yr_sales_goal, sht_yr_total_sales, sht_yr_total_comm, sht_notes)
-VALUES
-(@per_id_v, @sht_type_v, @sht_modified_v, @sht_modifier_v, @sht_date_v, @sht_yr_sales_goal_v, @sht_yr_total_sales_v, @sht_yr_total_comm_v, @sht_notes_v);
+    SELECT pro_name, pro_qoh,
+           FORMAT(pro_cost, 'C', 'en-us') AS cost,
+           FORMAT(pro_price, 'C', 'en-us') AS price,
+           str_name, cty_name, ste_name, reg_name
+    FROM product p
+    JOIN sale s ON p.pro_id = s.pro_id
+    JOIN store sr ON sr.str_id = s.str_id
+    JOIN city c ON sr.cty_id = c.cty_id
+    JOIN state st ON c.ste_id = st.ste_id
+    JOIN region r ON st.reg_id = r.reg_id
+    ORDER BY pro_qoh DESC;
 END
 GO
 
-print 'list table data before trigger fires:
-';
-select * from slsrep;
-select * from srp_hist;
+-- call stored procedure
+EXEC dbo.product_drill_down;
 
--- fire trigger
-INSERT INTO dbo.slsrep
-(per_id, srp_yr_sales_goal, srp_ytd_sales, srp_ytd_comm, srp_notes)
-VALUES
-(6, 98000, 43000, 8750, 'per_id values 1-5 already used');
-
-print 'list table data after trigger fires:
-';
-select * from slsrep;
-select * from srp_hist;
-
--- To list all database triggers
-SELECT * FROM sys.triggers;
-go
-
--- Display definition of trigger, stored procedure, or view
-sp_helptext 'dbo.trg_sales_history_insert'
-go
-
--- remove trigger from server memory
-DROP TRIGGER dbo.trg_sales_history_insert;
-go
-
-print '#5 Solution: Create trigger that automatically adds a record to the product history table for every record added to the product tabel
-';
-
-IF OBJECT_ID(N'dbo.trg_product_history_insert',N'TR') IS NOT NULL
-DROP TRIGGER dbo.trg_product_history_insert
+print '#3 Solution: Create a stored procedure (add_payment) that adds a payment record. Use variables and pass suitable arguments:';
 GO
-
-CREATE TRIGGER dbo.trg_product_history_insert
-ON dbo.product
-AFTER INSERT AS
-BEGIN
-    DECLARE
-        @pro_id_v smallint,
---          @pht_type_v, -- insert, update, or delete
-        @pht_modified_v date, -- when recorded
---          @pht_modifier_v, -- who made the change
-        @pht_cost_v decimal(7,2),
-        @pht_price_v decimal(7,2),
-        @pht_discount_v decimal(3,0),
-        @pht_notes_v varchar(255);
-
-        SELECT
-        @pro_id_v = pro_id,
-        @pht_modified_v = getDate(),
-        @pht_cost_v = pro_cost,
-        @pht_price_v = pro_discount,
-        @pht_discount_v = pro_discount,
-        @pht_notes_v = pro_notes
-        FROM INSERTED;
-
-        INSERT INTO dbo.product_hist
-        (pro_id, pht_date, pht_cost, pht_price, pht_discount, pht_notes)
-        VALUES
-        (@pro_id_v, @pht_modified_v, @pht_cost_v, @pht_price_v, @pht_discount_v, @pht_notes_v);
-END
-GO
-
-print 'list table data before trigger fires:
-
-';
-select * from product;
-select * from product_hist;
-
--- fire trigger
-INSERT INTO dbo.product
-(ven_id, pro_name, pro_descript, pro_weight, pro_qoh, pro_cost, pro_price, pro_discount, pro_notes)
-VALUES(3, 'desk lamp', 'small desk lamp with led lgihts', 3.6, 14, 5.98, 11.99, 15, 'No Discounts after sale.');
-
-print 'list table data after trigger fires:
-
-';
-select * from product;
-select * from product_hist;
-
--- To list all database triggers
-SELECT * FROM sys.triggers;
-GO
-
--- Display definition of trigger, stored procedure, or view
-sp_helptext 'dbo.trg_product_history_insert'
-go
-
--- Remove trigger from server memory
-DROP TRIGGER dbo.trg_product_history_insert;
-GO
-
--- Use single quotation mark to escape single quotation mark (otherwise, error)
-print '#6 Solution: stored procedure updates sales reps" yearly_sales_goal in the slsrep table, based upon 8% more than their previous year"s total sales
-
-';
 
 -- 1st arg is object name, 2nd arg is type (P=procedure)
-IF OBJECT_ID(N'dbo.sp_annual_salesrep_sales_goal', N'P')IS NOT NULL
-DROP PROC dbo.sp_annual_salesrep_sales_goal
+IF OBJECT_ID(N'dbo.add_payment', N'P') IS NOT NULL
+    DROP PROC dbo.add_payment;
 GO
 
-CREATE PROC dbo.sp_annual_salesrep_sales_goal AS
+CREATE PROC dbo.add_payment
+    @inv_id_p int,
+    @pay_date_p datetime,
+    @pay_amt_p decimal(7,2),
+    @pay_notes_p varchar(255)
+AS
 BEGIN
--- Update is based upon 8% of each sales rep's previous year's individual total sales (Note: see sht_yr_total_sales in srp_hist table)
-UPDATE slsrep 
-SET srp_yr_sales_goal = sht_yr_total_sales * 1.08
-from slsrep as sr
-    JOIN srp_hist as sh
-    ON sr.per_id = sh.per_id
-    -- NOTE: since all data is recent, use max() function for testing
-where sht_date=(select max(sht_date)from srp_hist);
+    -- don't need pay_id pk, because it is auto-increment
+    INSERT INTO payment (inv_id, pay_date, pay_amt, pay_notes)
+    VALUES (@inv_id_p, @pay_date_p, @pay_amt_p, @pay_notes_p);
 END
 GO
 
 print 'list table data before call:
 
 ';
-select * from dbo.slsrep;
-select * from dbo.srp_hist;
+SELECT * FROM payment;
 
--- call stored procedure 
-exec dbo.sp_annual_salesrep_sales_goal;
+-- initialize (i.e., declare and assign values to) variables
+DECLARE
+  @inv_id_v INT = 6,
+  @pay_date_v DATETIME = '2014-01-05 11:56:38',
+  @pay_amt_v DECIMAL(7,2) = 159.99,
+  @pay_notes_v VARCHAR(255) = 'testing add_payment';
 
-print 'list table data after call:
+-- call stored procedure
+EXEC dbo.add_payment @inv_id_v, @pay_date_v, @pay_amt_v, @pay_notes_v;
 
-';
-select * from dbo.slsrep;
+-- can't use parentheses to call stored procedure – will generate error
+-- EXEC dbo.add_payment (@inv_id_v, @pay_date_v, @pay_amt_v, @pay_notes_v);
 
+PRINT 'list table data after call:';
+SELECT * FROM payment;
 
+-- list all procedures (e.g., stored procedures or functions) for database
+SELECT * 
+FROM test.information_schema.routines
+WHERE routine_type = 'PROCEDURE';
+GO
 
+print '#4 Solution: Create a stored procedure (customer_balance) listing the customer''s id, name, invoice id, total paid on invoice, ' + CHAR(13)+CHAR(10) + 'balance derived attribute from the difference of a customer''s invoice total and their respective payments), ' + CHAR(13)+CHAR(10) + 'pass customer''s last name as argument:';
+GO
 
+-- 1st arg is object name, 2nd arg is type (P=procedure)
+IF OBJECT_ID(N'dbo.customer_balance', N'P') IS NOT NULL
+    DROP PROC dbo.customer_balance;
+GO
 
+CREATE PROC dbo.customer_balance
+    @per_lname_p VARCHAR(30)
+AS
+BEGIN
+    SELECT p.per_id, per_fname, per_lname, i.inv_id,
+           FORMAT(SUM(pay_amt), 'C', 'en-us') AS total_paid,
+           FORMAT((inv_total - SUM(pay_amt)), 'C', 'en-us') AS invoice_diff
+    FROM person p
+    JOIN dbo.customer c ON p.per_id = c.per_id
+    JOIN dbo.contact ct ON c.per_id = ct.per_cid
+    JOIN dbo.[order] o ON ct.cnt_id = o.cnt_id
+    JOIN dbo.invoice i ON o.ord_id = i.ord_id
+    JOIN dbo.payment pt ON i.inv_id = pt.inv_id
+    -- must be contained in group by, if not used in aggregate function
+    WHERE per_lname = @per_lname_p
+    GROUP BY p.per_id, i.inv_id, per_fname, per_lname, inv_total;
+END
+GO
 
+-- can initialize variable to empty string (single-quotation marks), also case-insensitive
+DECLARE @per_lname_v VARCHAR(30) = 'smith';
 
+-- call stored procedure
+EXEC dbo.customer_balance @per_lname_v;
+
+-- use single quotation mark to escape single quotation mark (otherwise, error)
+print '#5 Solution: Create and display the results of a stored procedure (store_sales_between_dates) that lists each store''s id, ' 
+    + CHAR(13)+CHAR(10) + 'sum of total sales (formatted), and years for a given time period, by passing the start/end dates, group by years, '
+    + CHAR(13)+CHAR(10) + 'and sort by total sales then years, both in descending order:';
+
+-- 1st arg is object name, 2nd arg is type (P=procedure)
+IF OBJECT_ID(N'dbo.store_sales_between_dates', N'P') IS NOT NULL
+    DROP PROC dbo.store_sales_between_dates;
+GO
+
+-- create stored procedure w/parameters
+CREATE PROC dbo.store_sales_between_dates
+    @start_date_p SMALLINT,
+    @end_date_p SMALLINT
+AS
+BEGIN
+    SELECT st.str_id, 
+           FORMAT(SUM(sal_total), 'C', 'en-us') AS 'total sales', 
+           tim_yr AS year
+    FROM store st
+    JOIN sale s ON st.str_id = s.str_id
+    JOIN time t ON s.tim_id = t.tim_id
+    WHERE tim_yr BETWEEN @start_date_p AND @end_date_p
+    GROUP BY tim_yr, st.str_id
+    ORDER BY SUM(sal_total) DESC, tim_yr DESC;
+END
+GO
+
+-- initialize variable to empty string (single-quotation marks), also case-insensitive
+DECLARE 
+    @start_date_v SMALLINT = 2010,
+    @end_date_v SMALLINT = 2013;
+
+-- call stored procedure
+EXEC dbo.store_sales_between_dates @start_date_v, @end_date_v;
+
+-- list all procedures (e.g., stored procedures or functions) for database
+SELECT * 
+FROM test.information_schema.routines
+WHERE routine_type = 'PROCEDURE';
+GO
+
+print '#6 Solution: Create a trigger (trg_check_inv_paid) that updates an invoice record, after a payment has been made, ' 
+    + CHAR(13)+CHAR(10) + 'indicating whether or not the invoice has been paid:';
+GO
+
+IF OBJECT_ID(N'dbo.trg_check_inv_paid', N'TR') IS NOT NULL
+    DROP TRIGGER dbo.trg_check_inv_paid;
+GO
+
+CREATE TRIGGER dbo.trg_check_inv_paid
+ON dbo.payment
+AFTER INSERT AS
+BEGIN
+    -- only use for testing: force all paid invoices to unpaid (0)
+    UPDATE invoice
+    SET inv_paid = 0;
+
+    -- checks if sum of payments >= invoice total, if so, updates inv_paid attribute
+    UPDATE invoice
+    SET inv_paid = 1
+    FROM invoice AS i
+    JOIN (
+        SELECT inv_id, SUM(pay_amt) AS total_paid
+        FROM payment
+        GROUP BY inv_id
+    ) AS v ON i.inv_id = v.inv_id
+    WHERE total_paid >= inv_total;
+END
+GO

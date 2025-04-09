@@ -39,6 +39,10 @@
     - Provide **screenshots** of ERD, populated tables, and SQL query results
 
 6. [A5 README.md](a5/README.md "My A5 README.md file")
+    - Create and implement **star schema model** for business intelligence with fact and dimension tables
+    - Populate **MS SQL Server tables** in RemoteLabs using T-SQL with required constraints and validation
+    - Develop **stored procedures and a trigger** to support BI reporting and invoice tracking
+    - Provide **screenshots** of ERD, reports, and include **Bitbucket repo** and `.sql` file link in README  
 
 7. [A6 README.md](a6/README.md "My A6 README.md file")
 

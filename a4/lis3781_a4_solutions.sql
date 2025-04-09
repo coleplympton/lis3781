@@ -66,6 +66,7 @@ CREATE TABLE dbo.person
 (
   per_id SMALLINT not null identity(1,1),
   per_ssn binary(64) NULL,
+  per_salt binary(64) NULL,
   per_fname VARCHAR(15) NOT NULL,
   per_lname VARCHAR(30) NOT NULL,
   per_gender CHAR(1) NOT NULL CHECK (per_gender IN('m', 'f')),
@@ -432,18 +433,18 @@ SELECT len(HASHBYTES('SHA2_512', 'test'));
 -- NOTE: do *not* include attribute name or value for auto increment attributes (i.e., pks)
 -- ----------------------------------------------
 INSERT INTO dbo.person
-(per_ssn, per_fname, per_lname, per_gender, per_dob, per_street, per_city, per_state, per_zip, per_email, per_type, per_notes)
+(per_ssn, per_salt, per_fname, per_lname, per_gender, per_dob, per_street, per_city, per_state, per_zip, per_email, per_type, per_notes)
 VALUES
-(HASHBYTES('SHA2_512', 'test1'), 'Michael', 'Johnson', 'm', '1985-04-17', '123 Maple Street', 'Chicago', 'IL', 606012345, 'mjohnson@gmail.com', 's', 'Senior sales rep'),
-(HASHBYTES('SHA2_512', 'test2'), 'Jennifer', 'Williams', 'f', '1979-11-30', '456 Oak Avenue', 'Boston', 'MA', 221201234, 'jwilliams@outlook.com', 's', 'Northeast territory'),
-(HASHBYTES('SHA2_512', 'test3'), 'David', 'Martinez', 'm', '1990-08-22', '789 Pine Road', 'Austin', 'TX', 787011234, 'dmartinez@yahoo.com', 's', 'New hire 2023'),
-(HASHBYTES('SHA2_512', 'test4'), 'Sarah', 'Garcia', 'f', '1982-05-15', '321 Cedar Lane', 'Portland', 'OR', 972011234, 'sgarcia@hotmail.com', 's', 'Western sales manager'),
-(HASHBYTES('SHA2_512', 'test5'), 'Robert', 'Taylor', 'm', '1975-09-03', '654 Birch Court', 'Denver', 'CO', 802011234, 'rtaylor@gmail.com', 's', 'Top performer 2024'),
-(HASHBYTES('SHA2_512', 'test6'), 'Emily', 'Anderson', 'f', '1988-07-19', '987 Redwood Drive', 'Phoenix', 'AZ', 850151234, 'eanderson@yahoo.com', 'c', 'Premium customer'),
-(HASHBYTES('SHA2_512', 'test7'), 'Christopher', 'Thomas', 'm', '1971-12-05', '159 Spruce Street', 'Nashville', 'TN', 372011234, 'cthomas@outlook.com', 'c', 'Since 2018'),
-(HASHBYTES('SHA2_512', 'test8'), 'Jessica', 'White', 'f', '1995-03-28', '753 Elm Boulevard', 'Miami', 'FL', 331301234, 'jwhite@gmail.com', 'c', 'Monthly subscription'),
-(HASHBYTES('SHA2_512', 'test9'), 'Daniel', 'Harris', 'm', '1980-01-14', '246 Aspen Way', 'San Diego', 'CA', 921001234, 'dharris@hotmail.com', 'c', 'High-volume orders'),
-(HASHBYTES('SHA2_512', 'test10'), 'Amanda', 'Martin', 'f', '1992-06-08', '135 Willow Path', 'Atlanta', 'GA', 303041234, 'amartin@yahoo.com', 'c', 'New account 2024');
+(1, NULL, 'Michael', 'Johnson', 'm', '1985-04-17', '123 Maple Street', 'Chicago', 'IL', 606012345, 'mjohnson@gmail.com', 's', 'Senior sales rep'),
+(2, NULL, 'Jennifer', 'Williams', 'f', '1979-11-30', '456 Oak Avenue', 'Boston', 'MA', 221201234, 'jwilliams@outlook.com', 's', 'Northeast territory'),
+(3, NULL,  'David', 'Martinez', 'm', '1990-08-22', '789 Pine Road', 'Austin', 'TX', 787011234, 'dmartinez@yahoo.com', 's', 'New hire 2023'),
+(4, NULL,  'Sarah', 'Garcia', 'f', '1982-05-15', '321 Cedar Lane', 'Portland', 'OR', 972011234, 'sgarcia@hotmail.com', 's', 'Western sales manager'),
+(5, NULL, 'Robert', 'Taylor', 'm', '1975-09-03', '654 Birch Court', 'Denver', 'CO', 802011234, 'rtaylor@gmail.com', 's', 'Top performer 2024'),
+(6, NULL, 'Emily', 'Anderson', 'f', '1988-07-19', '987 Redwood Drive', 'Phoenix', 'AZ', 850151234, 'eanderson@yahoo.com', 'c', 'Premium customer'),
+(7, NULL, 'Christopher', 'Thomas', 'm', '1971-12-05', '159 Spruce Street', 'Nashville', 'TN', 372011234, 'cthomas@outlook.com', 'c', 'Since 2018'),
+(8, NULL, 'Jessica', 'White', 'f', '1995-03-28', '753 Elm Boulevard', 'Miami', 'FL', 331301234, 'jwhite@gmail.com', 'c', 'Monthly subscription'),
+(9, NULL, 'Daniel', 'Harris', 'm', '1980-01-14', '246 Aspen Way', 'San Diego', 'CA', 921001234, 'dharris@hotmail.com', 'c', 'High-volume orders'),
+(10, NULL, 'Amanda', 'Martin', 'f', '1992-06-08', '135 Willow Path', 'Atlanta', 'GA', 303041234, 'amartin@yahoo.com', 'c', 'New account 2024');
 
 select * from dbo.person;
 
@@ -474,6 +475,17 @@ VALUES
 (10, 980.25, 23475.10, 'Wholesale distributor, bulk orders');
 
 select * from dbo.customer;
+
+-- ----------------------------------------------
+-- Data for table phone
+-- ----------------------------------------------
+INSERT INTO dbo.phone (per_id, phn_num, phn_type, phn_notes)
+VALUES
+(1, 8505551234, 'c', 'Personal cell phone'),
+(2, 8505552345, 'h', 'Home landline'),
+(3, 8505553456, 'w', 'Work phone for office use'),
+(4, 8505554567, 'f', 'Fax machine'),
+(5, 8505555678, 'c', 'Spare mobile phone');
 
 -- ----------------------------------------------
 -- Data for table contact
